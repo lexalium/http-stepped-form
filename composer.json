@@ -1,0 +1,36 @@
+{
+    "name": "lexal/http-stepped-form",
+    "description": "HTTP based Stepped Form.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alex Lex",
+            "email": "allapkov@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "lexal/stepped-form": "^1.0",
+        "symfony/http-foundation": "^5.3"
+    },
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+        "phpstan/phpstan": "^1.2",
+        "phpunit/phpunit": "^9.5",
+        "roave/security-advisories": "dev-latest",
+        "webimpress/coding-standard": "^1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lexal\\HttpSteppedForm\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lexal\\HttpSteppedForm\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
