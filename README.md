@@ -2,7 +2,7 @@
 
 The package is based on the
 [Stepped Form package](https://github.com/alexxxxkkk/stepped-form) and
-translates data to the Response instances.
+normalizes data into the Response instances.
 
 ## Requirements
 
@@ -18,8 +18,8 @@ composer require lexal/http-stepped-form
 
 ## Resources
 
-1. Exception Normalizer.
-2. How To Use.
+1. [Exception Normalizer](docs/EXCEPTION_NORMALIZER.md).
+2. [How To Use](docs/USAGE.md).
 
 ---
 
