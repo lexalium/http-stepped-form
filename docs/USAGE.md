@@ -87,14 +87,14 @@ use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\FormIsNotStartedExcept
 use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\StepNotFoundExceptionNormalizer;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\StepNotRenderableExceptionNormalizer;
 
-$normalizer = new ExceptionNormalizer(
+$normalizer = new ExceptionNormalizer([
     new AlreadyStartedExceptionNormalizer($redirector),
     new EntityNotFoundExceptionNormalizer($redirector),
     new FormIsNotStartedExceptionNormalizer($redirector),
     new StepNotRenderableExceptionNormalizer(),
     new StepNotFoundExceptionNormalizer(),
     new DefaultExceptionNormalizer(),
-);
+]);
 ```
 
 6. Create a Stepped Form instance.
