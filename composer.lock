@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/alexxxxkkk/stepped-form.git",
-                "reference": "369eeca2f5c8fdbe4cbab88ea171d205fb77b301"
+                "reference": "e8843eaf1dd9ff079a642fc398ac45e1059aebe5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alexxxxkkk/stepped-form/zipball/369eeca2f5c8fdbe4cbab88ea171d205fb77b301",
-                "reference": "369eeca2f5c8fdbe4cbab88ea171d205fb77b301",
+                "url": "https://api.github.com/repos/alexxxxkkk/stepped-form/zipball/e8843eaf1dd9ff079a642fc398ac45e1059aebe5",
+                "reference": "e8843eaf1dd9ff079a642fc398ac45e1059aebe5",
                 "shasum": ""
             },
             "require": {
@@ -48,11 +48,14 @@
                 }
             ],
             "description": "Implementation of the Stepped Form",
+            "keywords": [
+                "stepped-form"
+            ],
             "support": {
                 "issues": "https://github.com/alexxxxkkk/stepped-form/issues",
                 "source": "https://github.com/alexxxxkkk/stepped-form/tree/v1.0.0"
             },
-            "time": "2021-12-24T12:34:19+00:00"
+            "time": "2022-01-16T21:08:10+00:00"
         },
         {
             "name": "psr/event-dispatcher",
@@ -1005,16 +1008,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.3.3",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "151a51f6149855785fbd883e79768c0abc96b75f"
+                "reference": "72b04d97b5e6e60a081f17c416fef35bd521120b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/151a51f6149855785fbd883e79768c0abc96b75f",
-                "reference": "151a51f6149855785fbd883e79768c0abc96b75f",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/72b04d97b5e6e60a081f17c416fef35bd521120b",
+                "reference": "72b04d97b5e6e60a081f17c416fef35bd521120b",
                 "shasum": ""
             },
             "require": {
@@ -1030,7 +1033,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.3-dev"
+                    "dev-master": "1.4-dev"
                 }
             },
             "autoload": {
@@ -1045,7 +1048,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.3.3"
+                "source": "https://github.com/phpstan/phpstan/tree/1.4.0"
             },
             "funding": [
                 {
@@ -1065,7 +1068,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-07T09:49:03+00:00"
+            "time": "2022-01-14T15:58:47+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -1494,12 +1497,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "5d1ae7d4b053281a29a24e6e21ede5f9ef245b05"
+                "reference": "38da7ef14348ff26d7c415c4ed18b82db07fe199"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/5d1ae7d4b053281a29a24e6e21ede5f9ef245b05",
-                "reference": "5d1ae7d4b053281a29a24e6e21ede5f9ef245b05",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/38da7ef14348ff26d7c415c4ed18b82db07fe199",
+                "reference": "38da7ef14348ff26d7c415c4ed18b82db07fe199",
                 "shasum": ""
             },
             "conflict": {
@@ -1524,6 +1527,7 @@
                 "bk2k/bootstrap-package": ">=7.1,<7.1.2|>=8,<8.0.8|>=9,<9.0.4|>=9.1,<9.1.3|>=10,<10.0.10|>=11,<11.0.3",
                 "bolt/bolt": "<3.7.2",
                 "bolt/core": "<4.1.13",
+                "bottelet/flarepoint": "<2.2.1",
                 "brightlocal/phpwhois": "<=4.2.5",
                 "buddypress/buddypress": "<7.2.1",
                 "bugsnag/bugsnag-laravel": ">=2,<2.0.2",
@@ -1561,7 +1565,7 @@
                 "doctrine/mongodb-odm": ">=1,<1.0.2",
                 "doctrine/mongodb-odm-bundle": ">=2,<3.0.1",
                 "doctrine/orm": ">=2,<2.4.8|>=2.5,<2.5.1|>=2.8.3,<2.8.4",
-                "dolibarr/dolibarr": "<14|>= 3.3.beta1, < 13.0.2",
+                "dolibarr/dolibarr": "<=14.0.4|>= 3.3.beta1, < 13.0.2",
                 "dompdf/dompdf": ">=0.6,<0.6.2",
                 "drupal/core": ">=7,<7.80|>=8,<8.9.16|>=9,<9.1.12|>=9.2,<9.2.4",
                 "drupal/drupal": ">=7,<7.80|>=8,<8.9.16|>=9,<9.1.12|>=9.2,<9.2.4",
@@ -1687,7 +1691,7 @@
                 "october/cms": "= 1.1.1|= 1.0.471|= 1.0.469|>=1.0.319,<1.0.469",
                 "october/october": ">=1.0.319,<1.0.466|>=2.1,<2.1.12",
                 "october/rain": "<1.0.472|>=1.1,<1.1.2",
-                "october/system": "<1.0.472|>=1.1.1,<1.1.5|>=2.1,<2.1.12",
+                "october/system": "<1.0.473|>=1.1,<1.1.6|>=2.1,<2.1.12",
                 "onelogin/php-saml": "<2.10.4",
                 "oneup/uploader-bundle": "<1.9.3|>=2,<2.1.5",
                 "opencart/opencart": "<=3.0.3.2",
@@ -1695,7 +1699,7 @@
                 "openmage/magento-lts": "<19.4.15|>=20,<20.0.13",
                 "orchid/platform": ">=9,<9.4.4",
                 "oro/crm": ">=1.7,<1.7.4|>=3.1,<4.1.17|>=4.2,<4.2.7",
-                "oro/platform": ">=1.7,<1.7.4|>=3.1,<3.1.21|>=4.1,<4.1.14|>=4.2,<4.2.8",
+                "oro/platform": ">=1.7,<1.7.4|>=3.1,<3.1.29|>=4.1,<4.1.17|>=4.2,<4.2.8",
                 "padraic/humbug_get_contents": "<1.1.2",
                 "pagarme/pagarme-php": ">=0,<3",
                 "pagekit/pagekit": "<=1.0.18",
@@ -1718,7 +1722,7 @@
                 "phpwhois/phpwhois": "<=4.2.5",
                 "phpxmlrpc/extras": "<0.6.1",
                 "pimcore/pimcore": "<10.2.7",
-                "pocketmine/pocketmine-mp": "<4.0.5",
+                "pocketmine/pocketmine-mp": "<4.0.6",
                 "pressbooks/pressbooks": "<5.18",
                 "prestashop/autoupgrade": ">=4,<4.10.1",
                 "prestashop/contactform": ">1.0.1,<4.3",
@@ -1766,13 +1770,13 @@
                 "simplesamlphp/simplesamlphp-module-infocard": "<1.0.1",
                 "simplito/elliptic-php": "<1.0.6",
                 "slim/slim": "<2.6",
-                "smarty/smarty": "<3.1.39",
+                "smarty/smarty": "<3.1.43|>=4,<4.0.3",
                 "snipe/snipe-it": "<5.3.5",
                 "socalnick/scn-social-auth": "<1.15.2",
                 "socialiteproviders/steam": "<1.1",
                 "spoonity/tcpdf": "<6.2.22",
                 "squizlabs/php_codesniffer": ">=1,<2.8.1|>=3,<3.0.1",
-                "ssddanbrown/bookstack": "<21.11.3",
+                "ssddanbrown/bookstack": "<21.12.1",
                 "stormpath/sdk": ">=0,<9.9.99",
                 "studio-42/elfinder": "<2.1.59",
                 "subrion/cms": "<=4.2.1",
@@ -1927,7 +1931,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-07T00:58:09+00:00"
+            "time": "2022-01-14T21:13:43+00:00"
         },
         {
             "name": "sebastian/cli-parser",

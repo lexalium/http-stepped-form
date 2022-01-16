@@ -8,6 +8,10 @@
             "email": "allapkov@gmail.com"
         }
     ],
+    "keywords": [
+        "stepped-form",
+        "http"
+    ],
     "require": {
         "php": "^8.0",
         "lexal/stepped-form": "^1.0",
