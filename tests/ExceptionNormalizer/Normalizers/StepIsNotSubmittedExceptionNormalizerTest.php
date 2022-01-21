@@ -6,7 +6,8 @@ namespace Lexal\HttpSteppedForm\Tests\ExceptionNormalizer\Normalizers;
 
 use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
-use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\StepNotRenderableExceptionNormalizer;
+use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\StepIsNotSubmittedExceptionNormalizer;
+use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
 use Lexal\HttpSteppedForm\Tests\FormSettings;
 use Lexal\SteppedForm\Exception\AlreadyStartedException;
 use Lexal\SteppedForm\Exception\EntityNotFoundException;
@@ -19,34 +20,46 @@ use Lexal\SteppedForm\Exception\SteppedFormException;
 use Lexal\SteppedForm\Steps\Collection\Step;
 use Lexal\SteppedForm\Steps\Collection\StepsCollection;
 use Lexal\SteppedForm\Steps\StepInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class StepNotRenderableExceptionNormalizerTest extends TestCase
+class StepIsNotSubmittedExceptionNormalizerTest extends TestCase
 {
+    private MockObject $redirector;
     private ExceptionNormalizerInterface $normalizer;
 
     public function testSupportsNormalization(): void
     {
         $step = new Step('test', $this->createMock(StepInterface::class));
 
-        $this->assertTrue($this->normalizer->supportsNormalization(new StepNotRenderableException('test')));
+        $this->assertTrue($this->normalizer->supportsNormalization(new StepIsNotSubmittedException($step)));
+        $this->assertFalse($this->normalizer->supportsNormalization(new StepNotRenderableException('test')));
         $this->assertFalse($this->normalizer->supportsNormalization(new AlreadyStartedException('test', null)));
         $this->assertFalse($this->normalizer->supportsNormalization(new EntityNotFoundException('test')));
         $this->assertFalse($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
         $this->assertFalse($this->normalizer->supportsNormalization(new StepNotFoundException('test')));
         $this->assertFalse($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
-        $this->assertFalse($this->normalizer->supportsNormalization(new StepIsNotSubmittedException($step)));
         $this->assertFalse($this->normalizer->supportsNormalization(new SteppedFormException()));
     }
 
     public function testNormalize(): void
     {
-        $expected = new Response(status: Response::HTTP_NOT_FOUND);
+        $expected = new Response();
+
+        $collection = new StepsCollection([
+            new Step('test2', $this->createMock(StepInterface::class)),
+            new Step('test3', $this->createMock(StepInterface::class)),
+        ]);
+
+        $this->redirector->expects($this->once())
+            ->method('redirect')
+            ->with('test2', ['The Step [test2] is not submitted yet.'])
+            ->willReturn($expected);
 
         $actual = $this->normalizer->normalize(
-            new StepNotRenderableException('test'),
-            new ExceptionDefinition(new FormSettings(), new StepsCollection([])),
+            new StepIsNotSubmittedException(new Step('test2', $this->createMock(StepInterface::class))),
+            new ExceptionDefinition(new FormSettings(), $collection),
         );
 
         $this->assertEquals($expected, $actual);
@@ -54,7 +67,8 @@ class StepNotRenderableExceptionNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->normalizer = new StepNotRenderableExceptionNormalizer();
+        $this->redirector = $this->createMock(RedirectorInterface::class);
+        $this->normalizer = new StepIsNotSubmittedExceptionNormalizer($this->redirector);
 
         parent::setUp();
     }
