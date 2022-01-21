@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm\Tests;
 
+use Lexal\HttpSteppedForm\Exception\EntityNotFoundException as EntityNotFoundExceptionAdapter;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\Renderer\RendererInterface;
@@ -21,6 +22,7 @@ use Lexal\SteppedForm\SteppedFormInterface as BaseSteppedFormInterface;
 use Lexal\SteppedForm\Steps\Collection\Step;
 use Lexal\SteppedForm\Steps\Collection\StepsCollection;
 use Lexal\SteppedForm\Steps\RenderStepInterface;
+use Lexal\SteppedForm\Steps\StepInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -85,15 +87,31 @@ class SteppedFormTest extends TestCase
         $this->baseForm->expects($this->never())
             ->method('cancel');
 
-        $this->assertRenderException(new StepNotRenderableException('test'));
+        $this->assertRenderException(new StepNotRenderableException('test'), new StepsCollection([]));
     }
 
-    public function testRenderEntityNotFoundException(): void
+    public function testRenderEntityNotFoundExceptionWithoutNotSubmittedStep(): void
     {
         $this->baseForm->expects($this->once())
             ->method('cancel');
 
-        $this->assertRenderException(new EntityNotFoundException('test'));
+        $collection = new StepsCollection([
+            new Step('test', $this->createMock(StepInterface::class), isSubmitted: true),
+        ]);
+
+        $this->assertRenderException(new EntityNotFoundException('test'), $collection);
+    }
+
+    public function testRenderEntityNotFoundExceptionWithNotSubmittedStep(): void
+    {
+        $this->baseForm->expects($this->never())
+            ->method('cancel');
+
+        $collection = new StepsCollection([
+            new Step('test', $this->createMock(StepInterface::class), isSubmitted: false),
+        ]);
+
+        $this->assertRenderException(new EntityNotFoundException('test'), $collection);
     }
 
     public function testHandle(): void
@@ -186,27 +204,36 @@ class SteppedFormTest extends TestCase
         parent::setUp();
     }
 
-    private function assertRenderException(SteppedFormException $exception): void
+    private function assertRenderException(SteppedFormException $exception, StepsCollection $collection): void
     {
         $this->baseForm->expects($this->once())
             ->method('render')
             ->with('test')
             ->willThrowException($exception);
 
-        $this->assertExceptionNormalizer($exception, 'test');
+        if ($exception instanceof EntityNotFoundException) {
+            $exception = new EntityNotFoundExceptionAdapter($collection, $exception);
+        }
+
+        $this->assertExceptionNormalizer($exception, 'test', $collection);
 
         $this->assertEquals(new Response(), $this->form->render('test'));
     }
 
-    private function assertExceptionNormalizer(SteppedFormException $exception, ?string $key = null): void
-    {
+    private function assertExceptionNormalizer(
+        SteppedFormException $exception,
+        ?string $key = null,
+        ?StepsCollection $collection = null,
+    ): void {
+        $collection = $collection ?: new StepsCollection([]);
+
         $this->baseForm->expects($this->once())
             ->method('getSteps')
-            ->willReturn(new StepsCollection([]));
+            ->willReturn($collection);
 
         $this->exceptionNormalizer->expects($this->once())
             ->method('normalize')
-            ->with($exception, new ExceptionDefinition(new FormSettings(), new StepsCollection([]), $key))
+            ->with($exception, new ExceptionDefinition(new FormSettings(), $collection, $key))
             ->willReturn(new Response());
     }
 }

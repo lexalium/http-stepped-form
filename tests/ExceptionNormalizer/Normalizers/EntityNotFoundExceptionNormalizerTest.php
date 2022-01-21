@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm\Tests\ExceptionNormalizer\Normalizers;
 
+use Lexal\HttpSteppedForm\Exception\EntityNotFoundException as EntityNotFoundExceptionAdapter;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\EntityNotFoundExceptionNormalizer;
@@ -55,6 +56,44 @@ class EntityNotFoundExceptionNormalizerTest extends TestCase
         $actual = $this->normalizer->normalize(
             new EntityNotFoundException('test'),
             new ExceptionDefinition(new FormSettings(), new StepsCollection([])),
+        );
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testNormalizeNotSubmittedStepNotFound(): void
+    {
+        $expected = new Response();
+
+        $this->redirector->expects($this->once())
+            ->method('redirect')
+            ->with('before', ['The form session canceled. There is no data for the given [test] step.'])
+            ->willReturn($expected);
+
+        $actual = $this->normalizer->normalize(
+            new EntityNotFoundExceptionAdapter(new StepsCollection([]), new EntityNotFoundException('test')),
+            new ExceptionDefinition(new FormSettings(), new StepsCollection([])),
+        );
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testNormalizeNotSubmittedStepFound(): void
+    {
+        $expected = new Response();
+
+        $this->redirector->expects($this->once())
+            ->method('redirect')
+            ->with('test2', ['There is no data for the given [test2] step.'])
+            ->willReturn($expected);
+
+        $collection = new StepsCollection([
+            new Step('test2', $this->createMock(StepInterface::class), isSubmitted: false),
+        ]);
+
+        $actual = $this->normalizer->normalize(
+            new EntityNotFoundExceptionAdapter($collection, new EntityNotFoundException('test2')),
+            new ExceptionDefinition(new FormSettings(), $collection),
         );
 
         $this->assertEquals($expected, $actual);

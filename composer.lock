@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/alexxxxkkk/stepped-form.git",
-                "reference": "c2656b5bdcc868060b50e9323309093717fc3d3a"
+                "reference": "c7ef8785770d4f0f4d93392dcb47822c3bac45b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alexxxxkkk/stepped-form/zipball/c2656b5bdcc868060b50e9323309093717fc3d3a",
-                "reference": "c2656b5bdcc868060b50e9323309093717fc3d3a",
+                "url": "https://api.github.com/repos/alexxxxkkk/stepped-form/zipball/c7ef8785770d4f0f4d93392dcb47822c3bac45b0",
+                "reference": "c7ef8785770d4f0f4d93392dcb47822c3bac45b0",
                 "shasum": ""
             },
             "require": {
@@ -55,7 +55,7 @@
                 "issues": "https://github.com/alexxxxkkk/stepped-form/issues",
                 "source": "https://github.com/alexxxxkkk/stepped-form/tree/v1.1.0"
             },
-            "time": "2022-01-21T11:23:09+00:00"
+            "time": "2022-01-21T12:15:03+00:00"
         },
         {
             "name": "psr/event-dispatcher",

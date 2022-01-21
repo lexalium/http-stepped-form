@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers;
 
+use Lexal\HttpSteppedForm\Exception\EntityNotFoundException as EntityNotFoundExceptionAdapter;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
@@ -24,8 +25,22 @@ class EntityNotFoundExceptionNormalizer implements ExceptionNormalizerInterface
         return $exception instanceof EntityNotFoundException;
     }
 
+    /**
+     * @param EntityNotFoundException $exception
+     */
     public function normalize(SteppedFormException $exception, ExceptionDefinition $definition): Response
     {
+        if ($exception instanceof EntityNotFoundExceptionAdapter) {
+            $step = $exception->getNotSubmittedStep();
+
+            if ($step !== null) {
+                return $this->redirector->redirect(
+                    $definition->getFormSettings()->getStepUrl($step->getKey()),
+                    [$exception->getMessage()],
+                );
+            }
+        }
+
         return $this->redirector->redirect(
             $definition->getFormSettings()->getUrlBeforeStart(),
             [sprintf('The form session canceled. %s', $exception->getMessage())],

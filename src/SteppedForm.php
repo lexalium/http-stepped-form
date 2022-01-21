@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm;
 
+use Lexal\HttpSteppedForm\Exception\EntityNotFoundException as EntityNotFoundExceptionAdapter;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\Renderer\RendererInterface;
@@ -113,13 +114,19 @@ class SteppedForm implements SteppedFormInterface
      */
     private function handleStepException(SteppedFormException $exception, string $key): Response
     {
+        $steps = $this->form->getSteps();
+
         if ($exception instanceof EntityNotFoundException) {
-            $this->form->cancel();
+            $exception = new EntityNotFoundExceptionAdapter($steps, $exception);
+
+            if (!$exception->hasNotSubmittedStep()) {
+                $this->form->cancel();
+            }
         }
 
         return $this->exceptionNormalizer->normalize(
             $exception,
-            new ExceptionDefinition($this->formSettings, $this->form->getSteps(), $key),
+            new ExceptionDefinition($this->formSettings, $steps, $key),
         );
     }
 }
