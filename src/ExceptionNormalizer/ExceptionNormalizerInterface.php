@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm\ExceptionNormalizer;
 
-use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
+use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
 use Lexal\SteppedForm\Exception\SteppedFormException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,5 +18,5 @@ interface ExceptionNormalizerInterface
     /**
      * Transforms an exception to the response.
      */
-    public function normalize(SteppedFormException $exception, ExceptionDefinition $definition): Response;
+    public function normalize(SteppedFormException $exception, FormSettingsInterface $formSettings): Response;
 }

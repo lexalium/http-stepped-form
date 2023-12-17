@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace Lexal\HttpSteppedForm\Tests;
 
 use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
+use Lexal\SteppedForm\Step\StepKey;
 
-class FormSettings implements FormSettingsInterface
+final class FormSettings implements FormSettingsInterface
 {
-    public function __construct(private string $urlBeforeStart = 'before', private string $urlAfterFinish = 'finish')
-    {
+    public function __construct(
+        private readonly string $urlBeforeStart = 'before',
+        private readonly string $urlAfterFinish = 'finish',
+    ) {
     }
 
-    public function getStepUrl(string $key): string
+    public function getStepUrl(StepKey $key): string
     {
-        return $key;
+        return (string)$key;
     }
 
     public function getUrlAfterFinish(): string

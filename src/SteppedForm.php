@@ -4,30 +4,26 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm;
 
-use Lexal\HttpSteppedForm\Exception\EntityNotFoundException as EntityNotFoundExceptionAdapter;
-use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\Renderer\RendererInterface;
 use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
 use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
-use Lexal\SteppedForm\Exception\EntityNotFoundException;
-use Lexal\SteppedForm\Exception\FormIsNotStartedException;
 use Lexal\SteppedForm\Exception\SteppedFormException;
+use Lexal\SteppedForm\Step\StepKey;
 use Lexal\SteppedForm\SteppedFormInterface as BaseSteppedFormInterface;
-use Lexal\SteppedForm\Steps\Collection\Step;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use function array_replace_recursive;
 
-class SteppedForm implements SteppedFormInterface
+final class SteppedForm implements SteppedFormInterface
 {
     public function __construct(
-        private BaseSteppedFormInterface $form,
-        private FormSettingsInterface $formSettings,
-        private RedirectorInterface $redirector,
-        private RendererInterface $renderer,
-        private ExceptionNormalizerInterface $exceptionNormalizer,
+        private readonly BaseSteppedFormInterface $form,
+        private readonly FormSettingsInterface $formSettings,
+        private readonly RedirectorInterface $redirector,
+        private readonly RendererInterface $renderer,
+        private readonly ExceptionNormalizerInterface $exceptionNormalizer,
     ) {
     }
 
@@ -39,46 +35,33 @@ class SteppedForm implements SteppedFormInterface
     public function start(mixed $entity): Response
     {
         try {
-            $step = $this->form->start($entity);
+            $key = $this->form->start($entity);
         } catch (SteppedFormException $exception) {
-            return $this->exceptionNormalizer->normalize(
-                $exception,
-                new ExceptionDefinition($this->formSettings, $this->form->getSteps()),
-            );
+            return $this->handleFormException($exception);
         }
 
-        return $this->redirectToStep($step);
+        return $this->redirectToStep($key);
     }
 
-    /**
-     * @inheritDoc
-     *
-     * @throws FormIsNotStartedException
-     */
     public function render(string $key): Response
     {
         try {
-            $definition = $this->form->render($key);
+            $definition = $this->form->render(new StepKey($key));
         } catch (SteppedFormException $exception) {
-            return $this->handleStepException($exception, $key);
+            return $this->handleFormException($exception);
         }
 
         return $this->renderer->render($definition);
     }
 
-    /**
-     * @inheritDoc
-     *
-     * @throws FormIsNotStartedException
-     */
     public function handle(string $key, Request $request): Response
     {
         $data = array_replace_recursive($request->query->all(), $request->request->all(), $request->files->all());
 
         try {
-            $next = $this->form->handle($key, $data);
+            $next = $this->form->handle(new StepKey($key), $data);
         } catch (SteppedFormException $exception) {
-            return $this->handleStepException($exception, $key);
+            return $this->handleFormException($exception);
         }
 
         return $this->redirectToStep($next);
@@ -89,44 +72,25 @@ class SteppedForm implements SteppedFormInterface
         try {
             $this->form->cancel();
         } catch (SteppedFormException $exception) {
-            return $this->exceptionNormalizer->normalize(
-                $exception,
-                new ExceptionDefinition($this->formSettings, $this->form->getSteps()),
-            );
+            return $this->handleFormException($exception);
         }
 
         return $this->redirector->redirect($url);
     }
 
-    private function redirectToStep(?Step $step): Response
+    private function redirectToStep(?StepKey $key): Response
     {
-        if ($step === null) {
+        if ($key === null) {
             $url = $this->formSettings->getUrlAfterFinish();
         } else {
-            $url = $this->formSettings->getStepUrl($step->getKey());
+            $url = $this->formSettings->getStepUrl($key);
         }
 
         return $this->redirector->redirect($url);
     }
 
-    /**
-     * @throws FormIsNotStartedException
-     */
-    private function handleStepException(SteppedFormException $exception, string $key): Response
+    private function handleFormException(SteppedFormException $exception): Response
     {
-        $steps = $this->form->getSteps();
-
-        if ($exception instanceof EntityNotFoundException) {
-            $exception = new EntityNotFoundExceptionAdapter($steps, $exception);
-
-            if (!$exception->hasNotSubmittedStep()) {
-                $this->form->cancel();
-            }
-        }
-
-        return $this->exceptionNormalizer->normalize(
-            $exception,
-            new ExceptionDefinition($this->formSettings, $steps, $key),
-        );
+        return $this->exceptionNormalizer->normalize($exception, $this->formSettings);
     }
 }

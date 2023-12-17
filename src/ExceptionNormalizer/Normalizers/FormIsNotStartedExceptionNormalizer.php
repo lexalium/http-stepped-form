@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers;
 
-use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
+use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
 use Lexal\SteppedForm\Exception\FormIsNotStartedException;
 use Lexal\SteppedForm\Exception\SteppedFormException;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormIsNotStartedExceptionNormalizer implements ExceptionNormalizerInterface
+final class FormIsNotStartedExceptionNormalizer implements ExceptionNormalizerInterface
 {
-    public function __construct(private RedirectorInterface $redirector)
+    public function __construct(private readonly RedirectorInterface $redirector)
     {
     }
 
@@ -22,11 +22,8 @@ class FormIsNotStartedExceptionNormalizer implements ExceptionNormalizerInterfac
         return $exception instanceof FormIsNotStartedException;
     }
 
-    public function normalize(SteppedFormException $exception, ExceptionDefinition $definition): Response
+    public function normalize(SteppedFormException $exception, FormSettingsInterface $formSettings): Response
     {
-        return $this->redirector->redirect(
-            $definition->getFormSettings()->getUrlBeforeStart(),
-            [$exception->getMessage()],
-        );
+        return $this->redirector->redirect($formSettings->getUrlBeforeStart(), [$exception->getMessage()]);
     }
 }

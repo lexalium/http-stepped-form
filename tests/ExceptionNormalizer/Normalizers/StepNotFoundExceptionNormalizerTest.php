@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm\Tests\ExceptionNormalizer\Normalizers;
 
-use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\StepNotFoundExceptionNormalizer;
 use Lexal\HttpSteppedForm\Tests\FormSettings;
@@ -16,27 +15,32 @@ use Lexal\SteppedForm\Exception\StepNotFoundException;
 use Lexal\SteppedForm\Exception\StepNotRenderableException;
 use Lexal\SteppedForm\Exception\SteppedFormErrorsException;
 use Lexal\SteppedForm\Exception\SteppedFormException;
-use Lexal\SteppedForm\Steps\Collection\Step;
-use Lexal\SteppedForm\Steps\Collection\StepsCollection;
-use Lexal\SteppedForm\Steps\StepInterface;
+use Lexal\SteppedForm\Step\StepKey;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class StepNotFoundExceptionNormalizerTest extends TestCase
+final class StepNotFoundExceptionNormalizerTest extends TestCase
 {
     private ExceptionNormalizerInterface $normalizer;
 
+    protected function setUp(): void
+    {
+        $this->normalizer = new StepNotFoundExceptionNormalizer();
+    }
+
     public function testSupportsNormalization(): void
     {
-        $step = new Step('test', $this->createMock(StepInterface::class));
-
-        $this->assertTrue($this->normalizer->supportsNormalization(new StepNotFoundException('test')));
-        $this->assertFalse($this->normalizer->supportsNormalization(new AlreadyStartedException('test', null)));
-        $this->assertFalse($this->normalizer->supportsNormalization(new EntityNotFoundException('test')));
+        $this->assertTrue($this->normalizer->supportsNormalization(new StepNotFoundException(new StepKey('test'))));
+        $this->assertFalse($this->normalizer->supportsNormalization(new AlreadyStartedException('test')));
+        $this->assertFalse($this->normalizer->supportsNormalization(new EntityNotFoundException(new StepKey('test'))));
         $this->assertFalse($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new StepNotRenderableException('test')));
+        $this->assertFalse(
+            $this->normalizer->supportsNormalization(new StepNotRenderableException(new StepKey('test'))),
+        );
         $this->assertFalse($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
-        $this->assertFalse($this->normalizer->supportsNormalization(new StepIsNotSubmittedException($step)));
+        $this->assertFalse(
+            $this->normalizer->supportsNormalization(StepIsNotSubmittedException::finish(new StepKey('key'), null)),
+        );
         $this->assertFalse($this->normalizer->supportsNormalization(new SteppedFormException()));
     }
 
@@ -44,18 +48,8 @@ class StepNotFoundExceptionNormalizerTest extends TestCase
     {
         $expected = new Response(status: Response::HTTP_NOT_FOUND);
 
-        $actual = $this->normalizer->normalize(
-            new StepNotFoundException('test'),
-            new ExceptionDefinition(new FormSettings(), new StepsCollection([])),
-        );
+        $actual = $this->normalizer->normalize(new StepNotFoundException(new StepKey('test')), new FormSettings());
 
         $this->assertEquals($expected, $actual);
-    }
-
-    protected function setUp(): void
-    {
-        $this->normalizer = new StepNotFoundExceptionNormalizer();
-
-        parent::setUp();
     }
 }
