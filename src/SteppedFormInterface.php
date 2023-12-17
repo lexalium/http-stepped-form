@@ -18,7 +18,7 @@ interface SteppedFormInterface
     public function getEntity(): mixed;
 
     /**
-     * Starts a new form session and redirects to the first handled step.
+     * Starts a new form session and redirects to the first rendered step.
      */
     public function start(mixed $entity): Response;
 
@@ -33,7 +33,7 @@ interface SteppedFormInterface
     public function handle(string $key, Request $request): Response;
 
     /**
-     * Cancels current form session.
+     * Cancels current form session and redirects to given URL.
      */
     public function cancel(string $url): Response;
 }

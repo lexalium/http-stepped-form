@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Lexal\HttpSteppedForm\ExceptionNormalizer;
 
 use InvalidArgumentException;
-use Lexal\HttpSteppedForm\Exception\NoNormalizersAddedException;
+use Lexal\HttpSteppedForm\Exception\EmptyNoNormalizersException;
 use Lexal\HttpSteppedForm\Exception\NormalizerNotFoundException;
-use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
+use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
 use Lexal\SteppedForm\Exception\SteppedFormException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,7 +15,7 @@ use function get_class;
 use function get_debug_type;
 use function sprintf;
 
-class ExceptionNormalizer implements ExceptionNormalizerInterface
+final class ExceptionNormalizer implements ExceptionNormalizerInterface
 {
     /**
      * @var ExceptionNormalizerInterface[] $normalizers
@@ -30,7 +30,7 @@ class ExceptionNormalizer implements ExceptionNormalizerInterface
     /**
      * @param ExceptionNormalizerInterface[] $normalizers
      *
-     * @throws NoNormalizersAddedException
+     * @throws EmptyNoNormalizersException
      */
     public function __construct(array $normalizers)
     {
@@ -47,7 +47,7 @@ class ExceptionNormalizer implements ExceptionNormalizerInterface
         }
 
         if (!$normalizers) {
-            throw new NoNormalizersAddedException();
+            throw new EmptyNoNormalizersException();
         }
 
         $this->normalizers = $normalizers;
@@ -63,7 +63,7 @@ class ExceptionNormalizer implements ExceptionNormalizerInterface
      *
      * @throws NormalizerNotFoundException
      */
-    public function normalize(SteppedFormException $exception, ExceptionDefinition $definition): Response
+    public function normalize(SteppedFormException $exception, FormSettingsInterface $formSettings): Response
     {
         $normalizer = $this->getNormalizer($exception);
 
@@ -71,7 +71,7 @@ class ExceptionNormalizer implements ExceptionNormalizerInterface
             throw new NormalizerNotFoundException($exception);
         }
 
-        return $normalizer->normalize($exception, $definition);
+        return $normalizer->normalize($exception, $formSettings);
     }
 
     private function getNormalizer(SteppedFormException $exception): ?ExceptionNormalizerInterface

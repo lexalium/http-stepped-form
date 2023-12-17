@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers;
 
-use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
+use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
 use Lexal\SteppedForm\Exception\StepIsNotSubmittedException;
 use Lexal\SteppedForm\Exception\SteppedFormException;
 use Symfony\Component\HttpFoundation\Response;
 
-class StepIsNotSubmittedExceptionNormalizer implements ExceptionNormalizerInterface
+final class StepIsNotSubmittedExceptionNormalizer implements ExceptionNormalizerInterface
 {
-    public function __construct(private RedirectorInterface $redirector)
+    public function __construct(private readonly RedirectorInterface $redirector)
     {
     }
 
@@ -25,9 +25,13 @@ class StepIsNotSubmittedExceptionNormalizer implements ExceptionNormalizerInterf
     /**
      * @param StepIsNotSubmittedException $exception
      */
-    public function normalize(SteppedFormException $exception, ExceptionDefinition $definition): Response
+    public function normalize(SteppedFormException $exception, FormSettingsInterface $formSettings): Response
     {
-        $url = $definition->getFormSettings()->getStepUrl($exception->getStep()->getKey());
+        if ($exception->renderable === null) {
+            $url = $formSettings->getUrlBeforeStart();
+        } else {
+            $url = $formSettings->getStepUrl($exception->renderable);
+        }
 
         return $this->redirector->redirect($url, [$exception->getMessage()]);
     }

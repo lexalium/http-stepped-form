@@ -6,7 +6,7 @@ namespace Lexal\HttpSteppedForm\Exception;
 
 use Lexal\SteppedForm\Exception\SteppedFormException;
 
-class NoNormalizersAddedException extends SteppedFormException
+final class EmptyNoNormalizersException extends SteppedFormException
 {
     public function __construct()
     {

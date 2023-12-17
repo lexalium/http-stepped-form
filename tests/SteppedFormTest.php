@@ -4,63 +4,81 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm\Tests;
 
-use Lexal\HttpSteppedForm\Exception\EntityNotFoundException as EntityNotFoundExceptionAdapter;
-use Lexal\HttpSteppedForm\ExceptionNormalizer\Entity\ExceptionDefinition;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\Renderer\RendererInterface;
 use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
 use Lexal\HttpSteppedForm\SteppedForm;
 use Lexal\HttpSteppedForm\SteppedFormInterface;
-use Lexal\SteppedForm\Entity\TemplateDefinition;
 use Lexal\SteppedForm\Exception\AlreadyStartedException;
-use Lexal\SteppedForm\Exception\EntityNotFoundException;
 use Lexal\SteppedForm\Exception\FormIsNotStartedException;
 use Lexal\SteppedForm\Exception\StepNotRenderableException;
 use Lexal\SteppedForm\Exception\SteppedFormErrorsException;
-use Lexal\SteppedForm\Exception\SteppedFormException;
+use Lexal\SteppedForm\Step\StepKey;
+use Lexal\SteppedForm\Step\TemplateDefinition;
 use Lexal\SteppedForm\SteppedFormInterface as BaseSteppedFormInterface;
-use Lexal\SteppedForm\Steps\Collection\Step;
-use Lexal\SteppedForm\Steps\Collection\StepsCollection;
-use Lexal\SteppedForm\Steps\RenderStepInterface;
-use Lexal\SteppedForm\Steps\StepInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SteppedFormTest extends TestCase
+final class SteppedFormTest extends TestCase
 {
     private MockObject $renderer;
     private MockObject $redirector;
-    private MockObject $baseForm;
-    private MockObject $exceptionNormalizer;
+    private Stub $baseForm;
+    private Stub $exceptionNormalizer;
     private SteppedFormInterface $form;
 
-    public function testStart(): void
+    protected function setUp(): void
     {
-        $step = new Step('test', $this->createMock(RenderStepInterface::class));
+        $this->renderer = $this->createMock(RendererInterface::class);
+        $this->redirector = $this->createMock(RedirectorInterface::class);
+        $this->baseForm = $this->createStub(BaseSteppedFormInterface::class);
+        $this->exceptionNormalizer = $this->createStub(ExceptionNormalizerInterface::class);
 
-        $this->baseForm->expects($this->once())
-            ->method('start')
-            ->willReturn($step);
+        $this->form = new SteppedForm(
+            $this->baseForm,
+            new FormSettings(),
+            $this->redirector,
+            $this->renderer,
+            $this->exceptionNormalizer,
+        );
+    }
+
+    #[DataProvider('startDataProvider')]
+    public function testStart(?StepKey $key, ?string $expectedUrl): void
+    {
+        $this->baseForm->method('start')
+            ->willReturn($key);
 
         $this->redirector->expects($this->once())
             ->method('redirect')
-            ->with('test')
+            ->with($expectedUrl)
             ->willReturn(new Response());
 
         $this->assertEquals(new Response(), $this->form->start(['test']));
     }
 
+    /**
+     * @return iterable<string, array<StepKey|null|string>>
+     */
+    public static function startDataProvider(): iterable
+    {
+        yield 'with renderable step' => [new StepKey('key'), 'key'];
+        yield 'without renderable step' => [null, 'finish'];
+    }
+
     public function testStartException(): void
     {
-        $exception = new AlreadyStartedException('test', null);
+        $exception = new AlreadyStartedException('test');
 
-        $this->baseForm->expects($this->once())
-            ->method('start')
+        $this->baseForm->method('start')
             ->willThrowException($exception);
 
-        $this->assertExceptionNormalizer($exception);
+        $this->exceptionNormalizer->method('normalize')
+            ->willReturn(new Response());
 
         $this->assertEquals(new Response(), $this->form->start(['test']));
     }
@@ -69,9 +87,7 @@ class SteppedFormTest extends TestCase
     {
         $templateDefinition = new TemplateDefinition('template', []);
 
-        $this->baseForm->expects($this->once())
-            ->method('render')
-            ->with('test')
+        $this->baseForm->method('render')
             ->willReturn($templateDefinition);
 
         $this->renderer->expects($this->once())
@@ -84,87 +100,55 @@ class SteppedFormTest extends TestCase
 
     public function testRenderException(): void
     {
-        $this->baseForm->expects($this->never())
-            ->method('cancel');
+        $exception = new StepNotRenderableException(new StepKey('test'));
 
-        $this->assertRenderException(new StepNotRenderableException('test'), new StepsCollection([]));
+        $this->baseForm->method('render')
+            ->willThrowException($exception);
+
+        $this->exceptionNormalizer->method('normalize')
+            ->willReturn(new Response());
+
+        $this->assertEquals(new Response(), $this->form->render('test'));
     }
 
-    public function testRenderEntityNotFoundExceptionWithoutNotSubmittedStep(): void
+    #[DataProvider('handleDataProvider')]
+    public function testHandle(?StepKey $key, ?string $expectedUrl): void
     {
-        $this->baseForm->expects($this->once())
-            ->method('cancel');
-
-        $collection = new StepsCollection([
-            new Step('test', $this->createMock(StepInterface::class), isSubmitted: true),
-        ]);
-
-        $this->assertRenderException(new EntityNotFoundException('test'), $collection);
-    }
-
-    public function testRenderEntityNotFoundExceptionWithNotSubmittedStep(): void
-    {
-        $this->baseForm->expects($this->never())
-            ->method('cancel');
-
-        $collection = new StepsCollection([
-            new Step('test', $this->createMock(StepInterface::class), isSubmitted: false),
-        ]);
-
-        $this->assertRenderException(new EntityNotFoundException('test'), $collection);
-    }
-
-    public function testHandle(): void
-    {
-        $step = new Step('test', $this->createMock(RenderStepInterface::class));
-
-        $this->baseForm->expects($this->once())
-            ->method('handle')
-            ->with('test', [])
-            ->willReturn($step);
+        $this->baseForm->method('handle')
+            ->willReturn($key);
 
         $this->redirector->expects($this->once())
             ->method('redirect')
-            ->with('test')
+            ->with($expectedUrl)
             ->willReturn(new Response());
 
         $this->assertEquals(new Response(), $this->form->handle('test', new Request()));
     }
 
-    public function testHandleNextStepNotFound(): void
+    /**
+     * @return iterable<string, array<StepKey|null|string>>
+     */
+    public static function handleDataProvider(): iterable
     {
-        $this->baseForm->expects($this->once())
-            ->method('handle')
-            ->with('test', [])
-            ->willReturn(null);
-
-        $this->redirector->expects($this->once())
-            ->method('redirect')
-            ->with('finish')
-            ->willReturn(new Response());
-
-        $this->assertEquals(new Response(), $this->form->handle('test', new Request()));
+        yield 'with renderable step' => [new StepKey('key'), 'key'];
+        yield 'without renderable step' => [null, 'finish'];
     }
 
     public function testHandleException(): void
     {
         $exception = new SteppedFormErrorsException([]);
 
-        $this->baseForm->expects($this->once())
-            ->method('handle')
-            ->with('test', [])
+        $this->baseForm->method('handle')
             ->willThrowException($exception);
 
-        $this->assertExceptionNormalizer($exception, 'test');
+        $this->exceptionNormalizer->method('normalize')
+            ->willReturn(new Response());
 
         $this->assertEquals(new Response(), $this->form->handle('test', new Request()));
     }
 
     public function testCancel(): void
     {
-        $this->baseForm->expects($this->once())
-            ->method('cancel');
-
         $this->redirector->expects($this->once())
             ->method('redirect')
             ->with('cancel')
@@ -177,63 +161,12 @@ class SteppedFormTest extends TestCase
     {
         $exception = new FormIsNotStartedException();
 
-        $this->baseForm->expects($this->once())
-            ->method('cancel')
+        $this->baseForm->method('cancel')
             ->willThrowException($exception);
 
-        $this->assertExceptionNormalizer($exception);
+        $this->exceptionNormalizer->method('normalize')
+            ->willReturn(new Response());
 
         $this->assertEquals(new Response(), $this->form->cancel('cancel'));
-    }
-
-    protected function setUp(): void
-    {
-        $this->renderer = $this->createMock(RendererInterface::class);
-        $this->redirector = $this->createMock(RedirectorInterface::class);
-        $this->baseForm = $this->createMock(BaseSteppedFormInterface::class);
-        $this->exceptionNormalizer = $this->createMock(ExceptionNormalizerInterface::class);
-
-        $this->form = new SteppedForm(
-            $this->baseForm,
-            new FormSettings(),
-            $this->redirector,
-            $this->renderer,
-            $this->exceptionNormalizer,
-        );
-
-        parent::setUp();
-    }
-
-    private function assertRenderException(SteppedFormException $exception, StepsCollection $collection): void
-    {
-        $this->baseForm->expects($this->once())
-            ->method('render')
-            ->with('test')
-            ->willThrowException($exception);
-
-        if ($exception instanceof EntityNotFoundException) {
-            $exception = new EntityNotFoundExceptionAdapter($collection, $exception);
-        }
-
-        $this->assertExceptionNormalizer($exception, 'test', $collection);
-
-        $this->assertEquals(new Response(), $this->form->render('test'));
-    }
-
-    private function assertExceptionNormalizer(
-        SteppedFormException $exception,
-        ?string $key = null,
-        ?StepsCollection $collection = null,
-    ): void {
-        $collection = $collection ?: new StepsCollection([]);
-
-        $this->baseForm->expects($this->once())
-            ->method('getSteps')
-            ->willReturn($collection);
-
-        $this->exceptionNormalizer->expects($this->once())
-            ->method('normalize')
-            ->with($exception, new ExceptionDefinition(new FormSettings(), $collection, $key))
-            ->willReturn(new Response());
     }
 }

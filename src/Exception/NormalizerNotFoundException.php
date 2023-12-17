@@ -9,7 +9,7 @@ use Lexal\SteppedForm\Exception\SteppedFormException;
 use function get_class;
 use function sprintf;
 
-class NormalizerNotFoundException extends SteppedFormException
+final class NormalizerNotFoundException extends SteppedFormException
 {
     public function __construct(SteppedFormException $exception)
     {
