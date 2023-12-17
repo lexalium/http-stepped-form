@@ -1,5 +1,7 @@
 # HTTP based Stepped Form
 
+[![PHPUnit, PHPCS, PHPStan Tests](https://github.com/lexalium/http-stepped-form/actions/workflows/tests.yml/badge.svg)](https://github.com/lexalium/http-stepped-form/actions/workflows/tests.yml)
+
 The package is based on the [Stepped Form package](https://github.com/lexalium/stepped-form) and works with
 HTTP response and requests (transforms form exception into Response and renders or redirects depending on base
 form return value).
