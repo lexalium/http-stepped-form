@@ -117,7 +117,7 @@ composer require lexal/http-stepped-form
    use Lexal\HttpSteppedForm\SteppedForm;
 
    $form = new SteppedForm(
-       /* a base stepped form from the point 1 */,
+       /* a base stepped form from the step 1 */,
        $formSettings,
        $redirector,
        $renderer,
@@ -131,7 +131,10 @@ composer require lexal/http-stepped-form
     * Starts a new form session.
     * Returns redirect response to the next step or URL after form finish.
     */
-   $form->start(/* an entity for initializing a form state */);
+   $form->start(
+       /* an entity to initialize a form state */,
+       /* unique session key is you need to split different sessions of one form */,
+   );
 
    /* Renders step by its definition */
    $form->render('key');
