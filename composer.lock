@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "07a776879db746f014d49263236eeb61",
+    "content-hash": "a2de336c106c679e5607045f6b15602a",
     "packages": [
         {
             "name": "lexal/stepped-form",
-            "version": "v2.0.0",
+            "version": "v2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/lexalium/stepped-form.git",
-                "reference": "0241f3abff751a21aebec1555c64cae121a9680d"
+                "reference": "efdafeec97995877050cf9e993b5e73ab147f7f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/lexalium/stepped-form/zipball/0241f3abff751a21aebec1555c64cae121a9680d",
-                "reference": "0241f3abff751a21aebec1555c64cae121a9680d",
+                "url": "https://api.github.com/repos/lexalium/stepped-form/zipball/efdafeec97995877050cf9e993b5e73ab147f7f4",
+                "reference": "efdafeec97995877050cf9e993b5e73ab147f7f4",
                 "shasum": ""
             },
             "require": {
@@ -53,9 +53,9 @@
             ],
             "support": {
                 "issues": "https://github.com/lexalium/stepped-form/issues",
-                "source": "https://github.com/lexalium/stepped-form/tree/v2.0.0"
+                "source": "https://github.com/lexalium/stepped-form/tree/v2.1.0"
             },
-            "time": "2023-12-17T11:20:29+00:00"
+            "time": "2023-12-30T14:44:53+00:00"
         },
         {
             "name": "psr/event-dispatcher",

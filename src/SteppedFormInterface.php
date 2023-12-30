@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Lexal\HttpSteppedForm;
 
 use Lexal\SteppedForm\Exception\FormIsNotStartedException;
+use Lexal\SteppedForm\SteppedFormInterface as BaseSteppedFormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,7 +21,7 @@ interface SteppedFormInterface
     /**
      * Starts a new form session and redirects to the first rendered step.
      */
-    public function start(mixed $entity): Response;
+    public function start(mixed $entity, string $sessionKey = BaseSteppedFormInterface::DEFAULT_SESSION_KEY): Response;
 
     /**
      * Returns a response with rendered step.
