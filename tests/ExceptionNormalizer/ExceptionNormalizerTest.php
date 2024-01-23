@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lexal\HttpSteppedForm\Tests\ExceptionNormalizer;
 
 use InvalidArgumentException;
-use Lexal\HttpSteppedForm\Exception\EmptyNoNormalizersException;
+use Lexal\HttpSteppedForm\Exception\EmptyNormalizersException;
 use Lexal\HttpSteppedForm\Exception\NormalizerNotFoundException;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizer;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
@@ -20,18 +20,10 @@ use function sprintf;
 
 final class ExceptionNormalizerTest extends TestCase
 {
-    private ExceptionNormalizerInterface&Stub $normalizer;
-    private ExceptionNormalizerInterface $exceptionNormalizer;
-
-    protected function setUp(): void
-    {
-        $this->normalizer = $this->createMock(ExceptionNormalizerInterface::class);
-        $this->exceptionNormalizer = new ExceptionNormalizer([$this->normalizer]);
-    }
-
     public function testNoNormalizersAddedException(): void
     {
-        $this->expectExceptionObject(new EmptyNoNormalizersException());
+        $this->expectExceptionObject(new EmptyNormalizersException());
+        $this->expectExceptionMessage('You must register at least one normalizer to be able to normalize exceptions.');
 
         new ExceptionNormalizer([]);
     }
@@ -52,40 +44,66 @@ final class ExceptionNormalizerTest extends TestCase
 
     public function testSupportsNormalizationExists(): void
     {
-        $this->normalizer->method('supportsNormalization')
+        $normalizer = $this->createMock(ExceptionNormalizerInterface::class);
+
+        $exceptionNormalizer = new ExceptionNormalizer([$normalizer]);
+
+        $normalizer->method('supportsNormalization')
             ->willReturn(true);
 
-        $this->assertTrue($this->exceptionNormalizer->supportsNormalization(new SteppedFormException()));
+        self::assertTrue($exceptionNormalizer->supportsNormalization(new SteppedFormException()));
     }
 
     public function testSupportsNormalizationNotExists(): void
     {
-        $this->normalizer->method('supportsNormalization')
+        $normalizer = $this->createMock(ExceptionNormalizerInterface::class);
+
+        $exceptionNormalizer = new ExceptionNormalizer([$normalizer]);
+
+        $normalizer->method('supportsNormalization')
             ->willReturn(false);
 
-        $this->assertFalse($this->exceptionNormalizer->supportsNormalization(new SteppedFormException()));
+        self::assertFalse($exceptionNormalizer->supportsNormalization(new SteppedFormException()));
     }
 
     public function testNormalizeExists(): void
     {
-        $this->normalizer->method('normalize')
-            ->willReturn(new Response());
+        $normalizer1 = $this->createMock(ExceptionNormalizerInterface::class);
+        $normalizer2 = $this->createMock(ExceptionNormalizerInterface::class);
 
-        $this->normalizer->method('supportsNormalization')
+        $exceptionNormalizer = new ExceptionNormalizer([$normalizer1, $normalizer2]);
+
+        $normalizer1->method('supportsNormalization')
             ->willReturn(true);
 
-        $actual = $this->exceptionNormalizer->normalize(new SteppedFormException(), new FormSettings());
+        $normalizer1->method('normalize')
+            ->willReturn(new Response('correct content'));
 
-        $this->assertEquals(new Response(), $actual);
+        $normalizer2->method('supportsNormalization')
+            ->willReturn(true);
+
+        $normalizer2->method('normalize')
+            ->willReturn(new Response('incorrect content'));
+
+        $actual = $exceptionNormalizer->normalize(new SteppedFormException(), new FormSettings());
+
+        self::assertEquals(new Response('correct content'), $actual);
     }
 
     public function testNormalizeNotExists(): void
     {
         $this->expectExceptionObject(new NormalizerNotFoundException(new SteppedFormException()));
+        $this->expectExceptionMessage(
+            sprintf('Could not normalize exception [%s], no supporting normalizer found.', SteppedFormException::class),
+        );
 
-        $this->normalizer->method('supportsNormalization')
+        $normalizer = $this->createMock(ExceptionNormalizerInterface::class);
+
+        $exceptionNormalizer = new ExceptionNormalizer([$normalizer]);
+
+        $normalizer->method('supportsNormalization')
             ->willReturn(false);
 
-        $this->exceptionNormalizer->normalize(new SteppedFormException(), new FormSettings());
+        $exceptionNormalizer->normalize(new SteppedFormException(), new FormSettings());
     }
 }

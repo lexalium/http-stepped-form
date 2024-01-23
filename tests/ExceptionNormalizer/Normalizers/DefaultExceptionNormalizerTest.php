@@ -29,18 +29,18 @@ final class DefaultExceptionNormalizerTest extends TestCase
 
     public function testSupportsNormalization(): void
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(new AlreadyStartedException('test')));
-        $this->assertTrue($this->normalizer->supportsNormalization(new EntityNotFoundException(new StepKey('test'))));
-        $this->assertTrue($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
-        $this->assertTrue($this->normalizer->supportsNormalization(new StepNotFoundException(new StepKey('test'))));
-        $this->assertTrue(
+        self::assertTrue($this->normalizer->supportsNormalization(new AlreadyStartedException('test')));
+        self::assertTrue($this->normalizer->supportsNormalization(new EntityNotFoundException(new StepKey('test'))));
+        self::assertTrue($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
+        self::assertTrue($this->normalizer->supportsNormalization(new StepNotFoundException(new StepKey('test'))));
+        self::assertTrue(
             $this->normalizer->supportsNormalization(new StepNotRenderableException(new StepKey('test'))),
         );
-        $this->assertTrue($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
-        $this->assertTrue(
+        self::assertTrue($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
+        self::assertTrue(
             $this->normalizer->supportsNormalization(StepIsNotSubmittedException::finish(new StepKey('key'), null)),
         );
-        $this->assertTrue($this->normalizer->supportsNormalization(new SteppedFormException()));
+        self::assertTrue($this->normalizer->supportsNormalization(new SteppedFormException()));
     }
 
     public function testNormalize(): void

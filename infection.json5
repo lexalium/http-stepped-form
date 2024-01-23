@@ -1,0 +1,17 @@
+{
+  "$schema": "vendor/infection/infection/resources/schema.json",
+  "source": {
+    "directories": [
+      "src"
+    ],
+    "excludes": [
+      "src/SteppedFormSessionStorageBundle.php"
+    ]
+  },
+  "mutators": {
+    "@default": true
+  },
+  "testFramework": "phpunit",
+  "minCoveredMsi": 95,
+  "timeout": 3,
+}

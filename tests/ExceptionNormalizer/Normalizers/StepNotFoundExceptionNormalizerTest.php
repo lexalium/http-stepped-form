@@ -30,18 +30,18 @@ final class StepNotFoundExceptionNormalizerTest extends TestCase
 
     public function testSupportsNormalization(): void
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(new StepNotFoundException(new StepKey('test'))));
-        $this->assertFalse($this->normalizer->supportsNormalization(new AlreadyStartedException('test')));
-        $this->assertFalse($this->normalizer->supportsNormalization(new EntityNotFoundException(new StepKey('test'))));
-        $this->assertFalse($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
-        $this->assertFalse(
+        self::assertTrue($this->normalizer->supportsNormalization(new StepNotFoundException(new StepKey('test'))));
+        self::assertFalse($this->normalizer->supportsNormalization(new AlreadyStartedException('test')));
+        self::assertFalse($this->normalizer->supportsNormalization(new EntityNotFoundException(new StepKey('test'))));
+        self::assertFalse($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
+        self::assertFalse(
             $this->normalizer->supportsNormalization(new StepNotRenderableException(new StepKey('test'))),
         );
-        $this->assertFalse($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
-        $this->assertFalse(
+        self::assertFalse($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
+        self::assertFalse(
             $this->normalizer->supportsNormalization(StepIsNotSubmittedException::finish(new StepKey('key'), null)),
         );
-        $this->assertFalse($this->normalizer->supportsNormalization(new SteppedFormException()));
+        self::assertFalse($this->normalizer->supportsNormalization(new SteppedFormException()));
     }
 
     public function testNormalize(): void
@@ -50,6 +50,6 @@ final class StepNotFoundExceptionNormalizerTest extends TestCase
 
         $actual = $this->normalizer->normalize(new StepNotFoundException(new StepKey('test')), new FormSettings());
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 }

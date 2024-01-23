@@ -35,7 +35,7 @@ composer require lexal/http-stepped-form
 1. Create a base [Stepped Form](https://github.com/lexalium/stepped-form).
 2. Declare your form settings.
    ```php
-   use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;                                                            
+   use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
    use Lexal\SteppedForm\Step\StepKey;
 
    final class FormSettings implements FormSettingsInterface

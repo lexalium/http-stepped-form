@@ -34,18 +34,18 @@ final class AlreadyStartedExceptionNormalizerTest extends TestCase
 
     public function testSupportsNormalization(): void
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(new AlreadyStartedException('test')));
-        $this->assertFalse($this->normalizer->supportsNormalization(new EntityNotFoundException(new StepKey('test'))));
-        $this->assertFalse($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new StepNotFoundException(new StepKey('test'))));
-        $this->assertFalse(
+        self::assertTrue($this->normalizer->supportsNormalization(new AlreadyStartedException('test')));
+        self::assertFalse($this->normalizer->supportsNormalization(new EntityNotFoundException(new StepKey('test'))));
+        self::assertFalse($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
+        self::assertFalse($this->normalizer->supportsNormalization(new StepNotFoundException(new StepKey('test'))));
+        self::assertFalse(
             $this->normalizer->supportsNormalization(new StepNotRenderableException(new StepKey('test'))),
         );
-        $this->assertFalse($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
-        $this->assertFalse(
+        self::assertFalse($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
+        self::assertFalse(
             $this->normalizer->supportsNormalization(StepIsNotSubmittedException::finish(new StepKey('key'), null)),
         );
-        $this->assertFalse($this->normalizer->supportsNormalization(new SteppedFormException()));
+        self::assertFalse($this->normalizer->supportsNormalization(new SteppedFormException()));
     }
 
 
@@ -53,13 +53,13 @@ final class AlreadyStartedExceptionNormalizerTest extends TestCase
     {
         $expected = new Response();
 
-        $this->redirector->expects($this->once())
+        $this->redirector->expects(self::once())
             ->method('redirect')
             ->with(new StepKey('test'))
             ->willReturn($expected);
 
         $actual = $this->normalizer->normalize(new AlreadyStartedException('test'), new FormSettings());
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 }

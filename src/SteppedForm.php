@@ -9,6 +9,7 @@ use Lexal\HttpSteppedForm\Renderer\RendererInterface;
 use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
 use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
 use Lexal\SteppedForm\Exception\SteppedFormException;
+use Lexal\SteppedForm\Form\Storage\FormStorageInterface;
 use Lexal\SteppedForm\Step\StepKey;
 use Lexal\SteppedForm\SteppedFormInterface as BaseSteppedFormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +33,7 @@ final class SteppedForm implements SteppedFormInterface
         return $this->form->getEntity();
     }
 
-    public function start(mixed $entity, string $sessionKey = BaseSteppedFormInterface::DEFAULT_SESSION_KEY): Response
+    public function start(mixed $entity, string $sessionKey = FormStorageInterface::DEFAULT_SESSION_KEY): Response
     {
         try {
             $key = $this->form->start($entity, $sessionKey);

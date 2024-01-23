@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Lexal\HttpSteppedForm\ExceptionNormalizer;
 
 use InvalidArgumentException;
-use Lexal\HttpSteppedForm\Exception\EmptyNoNormalizersException;
+use Lexal\HttpSteppedForm\Exception\EmptyNormalizersException;
 use Lexal\HttpSteppedForm\Exception\NormalizerNotFoundException;
 use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
 use Lexal\SteppedForm\Exception\SteppedFormException;
@@ -30,7 +30,7 @@ final class ExceptionNormalizer implements ExceptionNormalizerInterface
     /**
      * @param ExceptionNormalizerInterface[] $normalizers
      *
-     * @throws EmptyNoNormalizersException
+     * @throws EmptyNormalizersException
      */
     public function __construct(array $normalizers)
     {
@@ -47,7 +47,7 @@ final class ExceptionNormalizer implements ExceptionNormalizerInterface
         }
 
         if (!$normalizers) {
-            throw new EmptyNoNormalizersException();
+            throw new EmptyNormalizersException();
         }
 
         $this->normalizers = $normalizers;
