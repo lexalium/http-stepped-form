@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lexal\HttpSteppedForm;
 
-use Lexal\SteppedForm\Exception\FormIsNotStartedException;
+use Lexal\SteppedForm\Exception\FormNotStartedException;
 use Lexal\SteppedForm\Form\Storage\FormStorageInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,14 +14,14 @@ interface SteppedFormInterface
     /**
      * Returns a form data.
      *
-     * @throws FormIsNotStartedException
+     * @throws FormNotStartedException
      */
-    public function getEntity(): mixed;
+    public function getEntity(): object;
 
     /**
      * Starts a new form session and redirects to the first rendered step.
      */
-    public function start(mixed $entity, string $sessionKey = FormStorageInterface::DEFAULT_SESSION_KEY): Response;
+    public function start(object $entity, string $session = FormStorageInterface::DEFAULT_SESSION_KEY): Response;
 
     /**
      * Returns a response with rendered step.
@@ -34,7 +34,7 @@ interface SteppedFormInterface
     public function handle(string $key, Request $request): Response;
 
     /**
-     * Cancels current form session and redirects to given URL.
+     * Cancels current form session and redirects to the given URL.
      */
     public function cancel(string $url): Response;
 }

@@ -28,15 +28,15 @@ final class SteppedForm implements SteppedFormInterface
     ) {
     }
 
-    public function getEntity(): mixed
+    public function getEntity(): object
     {
         return $this->form->getEntity();
     }
 
-    public function start(mixed $entity, string $sessionKey = FormStorageInterface::DEFAULT_SESSION_KEY): Response
+    public function start(object $entity, string $session = FormStorageInterface::DEFAULT_SESSION_KEY): Response
     {
         try {
-            $key = $this->form->start($entity, $sessionKey);
+            $key = $this->form->start($entity, $session);
         } catch (SteppedFormException $exception) {
             return $this->handleFormException($exception);
         }

@@ -4,14 +4,11 @@
     "directories": [
       "src"
     ],
-    "excludes": [
-      "src/SteppedFormSessionStorageBundle.php"
-    ]
   },
   "mutators": {
     "@default": true
   },
   "testFramework": "phpunit",
   "minCoveredMsi": 95,
-  "timeout": 3,
+  "timeout": 1,
 }

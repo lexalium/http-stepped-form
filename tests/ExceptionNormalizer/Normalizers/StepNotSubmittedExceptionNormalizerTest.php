@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Lexal\HttpSteppedForm\Tests\ExceptionNormalizer\Normalizers;
 
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
-use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\StepIsNotSubmittedExceptionNormalizer;
+use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\StepNotSubmittedExceptionNormalizer;
 use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
 use Lexal\HttpSteppedForm\Tests\FormSettings;
 use Lexal\SteppedForm\Exception\AlreadyStartedException;
 use Lexal\SteppedForm\Exception\EntityNotFoundException;
-use Lexal\SteppedForm\Exception\FormIsNotStartedException;
-use Lexal\SteppedForm\Exception\StepIsNotSubmittedException;
+use Lexal\SteppedForm\Exception\FormNotStartedException;
 use Lexal\SteppedForm\Exception\StepNotFoundException;
 use Lexal\SteppedForm\Exception\StepNotRenderableException;
+use Lexal\SteppedForm\Exception\StepNotSubmittedException;
 use Lexal\SteppedForm\Exception\SteppedFormErrorsException;
 use Lexal\SteppedForm\Exception\SteppedFormException;
 use Lexal\SteppedForm\Step\StepKey;
@@ -22,7 +22,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-final class StepIsNotSubmittedExceptionNormalizerTest extends TestCase
+final class StepNotSubmittedExceptionNormalizerTest extends TestCase
 {
     private MockObject $redirector;
     private ExceptionNormalizerInterface $normalizer;
@@ -30,30 +30,35 @@ final class StepIsNotSubmittedExceptionNormalizerTest extends TestCase
     protected function setUp(): void
     {
         $this->redirector = $this->createMock(RedirectorInterface::class);
-        $this->normalizer = new StepIsNotSubmittedExceptionNormalizer($this->redirector);
+        $this->normalizer = new StepNotSubmittedExceptionNormalizer($this->redirector);
     }
 
-    public function testSupportsNormalization(): void
+    #[DataProvider('supportsNormalizationDataProvider')]
+    public function testSupportsNormalization(SteppedFormException $exception, bool $expected): void
     {
-        self::assertTrue(
-            $this->normalizer->supportsNormalization(StepIsNotSubmittedException::finish(new StepKey('key'), null)),
-        );
-        self::assertFalse(
-            $this->normalizer->supportsNormalization(new StepNotRenderableException(new StepKey('test'))),
-        );
-        self::assertFalse($this->normalizer->supportsNormalization(new AlreadyStartedException('test')));
-        self::assertFalse($this->normalizer->supportsNormalization(new EntityNotFoundException(new StepKey('test'))));
-        self::assertFalse($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
-        self::assertFalse($this->normalizer->supportsNormalization(new StepNotFoundException(new StepKey('test'))));
-        self::assertFalse($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
-        self::assertFalse($this->normalizer->supportsNormalization(new SteppedFormException()));
+        self::assertEquals($expected, $this->normalizer->supportsNormalization($exception));
+    }
+
+    /**
+     * @return iterable<string, array{ 0: SteppedFormException, 1: boolean }>
+     */
+    public static function supportsNormalizationDataProvider(): iterable
+    {
+        yield 'StepNotSubmittedException' => [StepNotSubmittedException::finish(new StepKey('key'), null), true];
+        yield 'AlreadyStartedException' => [new AlreadyStartedException('test'), false];
+        yield 'EntityNotFoundException' => [new EntityNotFoundException(new StepKey('test')), false];
+        yield 'FormNotStartedException' => [new FormNotStartedException(), false];
+        yield 'StepNotFoundException' => [new StepNotFoundException(new StepKey('test')), false];
+        yield 'StepNotRenderableException' => [new StepNotRenderableException(new StepKey('test')), false];
+        yield 'SteppedFormErrorsException' => [new SteppedFormErrorsException([]), false];
+        yield 'SteppedFormException' => [new SteppedFormException(), false];
     }
 
     #[DataProvider('normalizeDataProvider')]
     public function testNormalize(?StepKey $renderable, string $expectedUrl): void
     {
         $expected = new Response();
-        $exception = StepIsNotSubmittedException::previous(new StepKey('test2'), $renderable);
+        $exception = StepNotSubmittedException::previous(new StepKey('test2'), $renderable);
 
         $this->redirector->expects(self::once())
             ->method('redirect')

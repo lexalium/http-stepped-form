@@ -14,12 +14,12 @@ interface FormSettingsInterface
     public function getStepUrl(StepKey $key): string;
 
     /**
-     * Returns a URL to redirect to when the form was finishing.
+     * Returns a URL to redirect to when the form is finished.
      */
     public function getUrlAfterFinish(): string;
 
     /**
-     * Returns a URL to redirect to when there is no previously renderable step.
+     * Returns a URL to redirect to when there is no renderable step.
      */
     public function getUrlBeforeStart(): string;
 }
