@@ -3,7 +3,7 @@
 [![PHPUnit, PHPCS, PHPStan Tests](https://github.com/lexalium/http-stepped-form/actions/workflows/tests.yml/badge.svg)](https://github.com/lexalium/http-stepped-form/actions/workflows/tests.yml)
 
 The package is based on the [Stepped Form package](https://github.com/lexalium/stepped-form) and works with
-HTTP response and requests (transforms form exception into Response and renders or redirects depending on base
+HTTP response and request (transforms form exception into Response and renders or redirects depending on base
 form return value).
 
 <a id="readme-top" mame="readme-top"></a>
@@ -47,12 +47,12 @@ composer require lexal/http-stepped-form
  
        public function getUrlBeforeStart(): string
        {
-           // returns a URL to redirect to when there is no previously renderable step
+           // returns a URL to redirect to when there is no renderable step
        }
 
        public function getUrlAfterFinish(): string
        {
-           // return a URL to redirect to when the form was finishing
+           // return a URL to redirect to when the form is finished
        }
    }
 
@@ -75,7 +75,7 @@ composer require lexal/http-stepped-form
    $redirector = new Redirector();
    ```
 
-4. Create a Renderer. The Renderer crates and returns Response by template definition.
+4. Create a Renderer. The Renderer creates and returns Response by template definition.
    ```php
    use Lexal\HttpSteppedForm\Renderer\RendererInterface;
    use Lexal\SteppedForm\Entity\TemplateDefinition;
@@ -98,14 +98,14 @@ composer require lexal/http-stepped-form
    use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\AlreadyStartedExceptionNormalizer;
    use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\DefaultExceptionNormalizer;
    use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\EntityNotFoundExceptionNormalizer;
-   use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\FormIsNotStartedExceptionNormalizer;
+   use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\FormNotStartedExceptionNormalizer;
    use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\StepNotFoundExceptionNormalizer;
    use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\StepNotRenderableExceptionNormalizer;
    
    $normalizer = new ExceptionNormalizer([
        new AlreadyStartedExceptionNormalizer($redirector),
        new EntityNotFoundExceptionNormalizer($redirector),
-       new FormIsNotStartedExceptionNormalizer($redirector),
+       new FormNotStartedExceptionNormalizer($redirector),
        new StepNotRenderableExceptionNormalizer(),
        new StepNotFoundExceptionNormalizer(),
        new DefaultExceptionNormalizer(),
@@ -133,7 +133,7 @@ composer require lexal/http-stepped-form
     */
    $form->start(
        /* an entity to initialize a form state */,
-       /* unique session key is you need to split different sessions of one form */,
+       /* unique session key if you need to split different sessions of one form */,
    );
 
    /* Renders step by its definition */
@@ -153,8 +153,8 @@ composer require lexal/http-stepped-form
 
 ## Exception Normalizers
 
-Exception Normalizers are used for the normalizing Stepped Form exceptions into the Response instance. Create class
-that implements `ExceptionNormalizerInterface` to create your own exception normalizer.
+Exception Normalizers are used for normalizing Stepped Form exceptions into the Response instance. Create class
+that implements `ExceptionNormalizerInterface` to have your own exception normalizer.
 
 ```php
 use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
@@ -182,12 +182,12 @@ The package already contains normalizers for all available exceptions:
 1. `AlreadyStartedExceptionNormalizer` - redirects to the current renderable step.
 2. `EntityNotFoundExceptionNormalizer` - redirects with errors to the previously renderable step or the URL
    before form start.
-3. `FormIsNotStartedExceptionNormalizer` - redirects with errors to the URL before form start.
+3. `FormNotStartedExceptionNormalizer` - redirects with errors to the URL before form start.
 4. `StepNotFoundExceptionNormalizer` - returns 404 HTTP status code.
 5. `StepNotRenderableExceptionNormalizer` - returns 404 HTTP status code.
 6. `SteppedFormErrorsExceptionNormalizer` - redirects with errors to the previously renderable step or the URL
    before form start.
-7. `StepIsNotSubmittedExceptionNormalizer` - redirects with errors to the previously renderable step or the URL
+7. `StepNotSubmittedExceptionNormalizer` - redirects with errors to the previously renderable step or the URL
    before form start.
 8. `DefaultExceptionNormalizer` - rethrows exception.
 

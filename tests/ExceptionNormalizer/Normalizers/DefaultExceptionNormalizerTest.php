@@ -9,13 +9,18 @@ use Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers\DefaultExceptionNormal
 use Lexal\HttpSteppedForm\Tests\FormSettings;
 use Lexal\SteppedForm\Exception\AlreadyStartedException;
 use Lexal\SteppedForm\Exception\EntityNotFoundException;
-use Lexal\SteppedForm\Exception\FormIsNotStartedException;
-use Lexal\SteppedForm\Exception\StepIsNotSubmittedException;
+use Lexal\SteppedForm\Exception\EventDispatcherException;
+use Lexal\SteppedForm\Exception\FormNotStartedException;
+use Lexal\SteppedForm\Exception\KeysNotFoundInStorageException;
+use Lexal\SteppedForm\Exception\NoStepsAddedException;
+use Lexal\SteppedForm\Exception\ReadSessionKeyException;
 use Lexal\SteppedForm\Exception\StepNotFoundException;
 use Lexal\SteppedForm\Exception\StepNotRenderableException;
+use Lexal\SteppedForm\Exception\StepNotSubmittedException;
 use Lexal\SteppedForm\Exception\SteppedFormErrorsException;
 use Lexal\SteppedForm\Exception\SteppedFormException;
 use Lexal\SteppedForm\Step\StepKey;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class DefaultExceptionNormalizerTest extends TestCase
@@ -27,20 +32,29 @@ final class DefaultExceptionNormalizerTest extends TestCase
         $this->normalizer = new DefaultExceptionNormalizer();
     }
 
-    public function testSupportsNormalization(): void
+    #[DataProvider('supportsNormalizationDataProvider')]
+    public function testSupportsNormalization(SteppedFormException $exception, bool $expected): void
     {
-        self::assertTrue($this->normalizer->supportsNormalization(new AlreadyStartedException('test')));
-        self::assertTrue($this->normalizer->supportsNormalization(new EntityNotFoundException(new StepKey('test'))));
-        self::assertTrue($this->normalizer->supportsNormalization(new FormIsNotStartedException()));
-        self::assertTrue($this->normalizer->supportsNormalization(new StepNotFoundException(new StepKey('test'))));
-        self::assertTrue(
-            $this->normalizer->supportsNormalization(new StepNotRenderableException(new StepKey('test'))),
-        );
-        self::assertTrue($this->normalizer->supportsNormalization(new SteppedFormErrorsException([])));
-        self::assertTrue(
-            $this->normalizer->supportsNormalization(StepIsNotSubmittedException::finish(new StepKey('key'), null)),
-        );
-        self::assertTrue($this->normalizer->supportsNormalization(new SteppedFormException()));
+        self::assertEquals($expected, $this->normalizer->supportsNormalization($exception));
+    }
+
+    /**
+     * @return iterable<string, array{ 0: SteppedFormException, 1: boolean }>
+     */
+    public static function supportsNormalizationDataProvider(): iterable
+    {
+        yield 'AlreadyStartedException' => [new AlreadyStartedException('test'), true];
+        yield 'EntityNotFoundException' => [new EntityNotFoundException(new StepKey('test')), true];
+        yield 'FormNotStartedException' => [new FormNotStartedException(), true];
+        yield 'StepNotFoundException' => [new StepNotFoundException(new StepKey('test')), true];
+        yield 'StepNotRenderableException' => [new StepNotRenderableException(new StepKey('test')), true];
+        yield 'SteppedFormErrorsException' => [new SteppedFormErrorsException([]), true];
+        yield 'StepNotSubmittedException' => [StepNotSubmittedException::finish(new StepKey('key'), null), true];
+        yield 'SteppedFormException' => [new SteppedFormException(), true];
+        yield 'ReadSessionKeyException' => [new ReadSessionKeyException(), true];
+        yield 'KeysNotFoundInStorageException' => [new KeysNotFoundInStorageException(), true];
+        yield 'NoStepsAddedException' => [new NoStepsAddedException(), true];
+        yield 'EventDispatcherException' => [new EventDispatcherException([]), true];
     }
 
     public function testNormalize(): void

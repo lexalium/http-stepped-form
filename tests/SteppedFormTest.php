@@ -10,7 +10,7 @@ use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
 use Lexal\HttpSteppedForm\SteppedForm;
 use Lexal\HttpSteppedForm\SteppedFormInterface;
 use Lexal\SteppedForm\Exception\AlreadyStartedException;
-use Lexal\SteppedForm\Exception\FormIsNotStartedException;
+use Lexal\SteppedForm\Exception\FormNotStartedException;
 use Lexal\SteppedForm\Exception\StepNotRenderableException;
 use Lexal\SteppedForm\Exception\SteppedFormErrorsException;
 use Lexal\SteppedForm\Step\StepKey;
@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,9 +52,12 @@ final class SteppedFormTest extends TestCase
     #[DataProvider('startDataProvider')]
     public function testStart(?StepKey $key, ?string $expectedUrl): void
     {
+        $entity = new stdClass();
+        $entity->name = 'test';
+
         $this->baseForm->expects(self::once())
             ->method('start')
-            ->with(['test'], '__MAIN__')
+            ->with($entity, '__MAIN__')
             ->willReturn($key);
 
         $this->redirector->expects(self::once())
@@ -61,7 +65,7 @@ final class SteppedFormTest extends TestCase
             ->with($expectedUrl)
             ->willReturn(new Response());
 
-        self::assertEquals(new Response(), $this->form->start(['test']));
+        self::assertEquals(new Response(), $this->form->start($entity));
     }
 
     /**
@@ -84,7 +88,7 @@ final class SteppedFormTest extends TestCase
         $this->exceptionNormalizer->method('normalize')
             ->willReturn(new Response());
 
-        self::assertEquals(new Response(), $this->form->start(['test']));
+        self::assertEquals(new Response(), $this->form->start(new stdClass()));
     }
 
     public function testRender(): void
@@ -186,7 +190,7 @@ final class SteppedFormTest extends TestCase
 
     public function testCancelException(): void
     {
-        $exception = new FormIsNotStartedException();
+        $exception = new FormNotStartedException();
 
         $this->baseForm->expects(self::once())
             ->method('cancel')
