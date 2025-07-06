@@ -11,7 +11,6 @@ use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizer;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\Tests\FormSettings;
 use Lexal\SteppedForm\Exception\SteppedFormException;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\Response;

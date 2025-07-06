@@ -7,11 +7,11 @@ namespace Lexal\HttpSteppedForm\ExceptionNormalizer\Normalizers;
 use Lexal\HttpSteppedForm\ExceptionNormalizer\ExceptionNormalizerInterface;
 use Lexal\HttpSteppedForm\Routing\RedirectorInterface;
 use Lexal\HttpSteppedForm\Settings\FormSettingsInterface;
-use Lexal\SteppedForm\Exception\StepIsNotSubmittedException;
+use Lexal\SteppedForm\Exception\StepNotSubmittedException;
 use Lexal\SteppedForm\Exception\SteppedFormException;
 use Symfony\Component\HttpFoundation\Response;
 
-final class StepIsNotSubmittedExceptionNormalizer implements ExceptionNormalizerInterface
+final class StepNotSubmittedExceptionNormalizer implements ExceptionNormalizerInterface
 {
     public function __construct(private readonly RedirectorInterface $redirector)
     {
@@ -19,11 +19,11 @@ final class StepIsNotSubmittedExceptionNormalizer implements ExceptionNormalizer
 
     public function supportsNormalization(SteppedFormException $exception): bool
     {
-        return $exception instanceof StepIsNotSubmittedException;
+        return $exception instanceof StepNotSubmittedException;
     }
 
     /**
-     * @param StepIsNotSubmittedException $exception
+     * @param StepNotSubmittedException $exception
      */
     public function normalize(SteppedFormException $exception, FormSettingsInterface $formSettings): Response
     {
