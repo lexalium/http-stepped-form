@@ -17,13 +17,13 @@
     "require": {
         "php": ">=8.1",
         "lexal/stepped-form": "^4.0",
-        "symfony/http-foundation": "^5.4 || ^6.4 || ^7.2"
+        "symfony/http-foundation": "^5.4.50 || ^6.4.29 || ^7.3.7"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "infection/infection": "<=0.29.9",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^10.5",
+        "phpunit/phpunit": "^10.5.62",
         "roave/security-advisories": "dev-latest",
         "webimpress/coding-standard": "^1.4"
     },
