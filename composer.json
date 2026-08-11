@@ -17,7 +17,7 @@
     "require": {
         "php": ">=8.1",
         "lexal/stepped-form": "^4.0",
-        "symfony/http-foundation": "^5.4.50 || ^6.4.29 || ^7.3.7"
+        "symfony/http-foundation": "^5.4.50 || ^6.4.29 || ^7.4.13"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
